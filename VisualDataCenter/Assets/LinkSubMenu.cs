@@ -5,14 +5,15 @@ using UnityEngine;
 
 public class LinkSubMenu : MonoBehaviour
 {
+    public bool pressedYes = false;
 
     public GameObject main;
     private GameObject data;
 
     public GameObject collided_server;
 
-    private RackObjectData.ObjectData device_one = new RackObjectData.ObjectData();
-    private RackObjectData.ObjectData device_two = new RackObjectData.ObjectData();
+    public RackObjectData.ObjectData device_one = new RackObjectData.ObjectData();
+    public RackObjectData.ObjectData device_two = new RackObjectData.ObjectData();
     private int port_one, port_two;
 
     public bool menu_active;
@@ -276,7 +277,7 @@ public class LinkSubMenu : MonoBehaviour
             if (device_one == null) port_1.GetComponentInChildren<Text>().text = "No Ports";
             else
             {
-                device_1.GetComponentInChildren<Text>().text = "ID " + device_one.id.ToString();
+                device_1.GetComponentInChildren<Text>().text = "ID: " + device_one.name;
                 port_1.GetComponentInChildren<Text>().text = "Port " + port_one.ToString();
             }
         }
@@ -291,7 +292,7 @@ public class LinkSubMenu : MonoBehaviour
                 if (data.GetComponent<RackObjectData>().routers[i].obj.name == collided_server.name)
                 {
                     device_two = data.GetComponent<RackObjectData>().routers[i];
-                    for (int j = 0; j < 8; i++)
+                    for (int j = 0; j < 8; j++)
                     {
                         if (!device_two.ports[j])
                         {
@@ -305,7 +306,7 @@ public class LinkSubMenu : MonoBehaviour
                 else if (data.GetComponent<RackObjectData>().switches[i].obj.name == collided_server.name)
                 {
                     device_two = data.GetComponent<RackObjectData>().switches[i];
-                    for (int j = 0; j < 8; i++)
+                    for (int j = 0; j < 8; j++)
                     {
                         if (!device_two.ports[j])
                         {
@@ -321,7 +322,7 @@ public class LinkSubMenu : MonoBehaviour
             if (device_two == null) port_2.GetComponentInChildren<Text>().text = "No Ports";
             else
             {
-                device_2.GetComponentInChildren<Text>().text = "ID " + device_one.id.ToString();
+                device_2.GetComponentInChildren<Text>().text = "ID: " + device_two.name;
                 port_2.GetComponentInChildren<Text>().text = "Port " + port_one.ToString();
             }
         }
@@ -337,11 +338,42 @@ public class LinkSubMenu : MonoBehaviour
 
     void confirmLink()
     {
-        if(device_one != null && device_two != null && OVRInput.GetDown(OVRInput.Button.One))
+        if (OVRInput.GetDown(OVRInput.Button.One)) {
+            pressedYes = true;
+        }
+        if (device_one != null && device_two != null && OVRInput.GetDown(OVRInput.Button.One))
         {
+            pressedYes = true;
             /*
                 Call Victor's function
             */
+            int p1;
+            int a1;
+            int p2;
+            int a2;
+            if (device_one.is_router)
+            {
+                p1 = 0;
+                a1 = port_one;
+            }
+            else
+            {
+                p1 = port_one;
+                a1 = 0;
+            }
+
+            if (device_two.is_router)
+            {
+                p2 = 0;
+                a2 = port_two;
+            }
+            else
+            {
+                p2 = port_two;
+                a2 = 0;
+            }
+
+            StartCoroutine(main.GetComponent<MainMenu>().projectHandle.CreateLink(device_one.id, device_two.id, p1, p2, a1, a2));
             // set up cable
             device_one = null;
             device_two = null;
@@ -350,10 +382,6 @@ public class LinkSubMenu : MonoBehaviour
 
     void exitMenu()
     {
-        device_1.GetComponent<Text>().text = "Device 1";
-        port_1.GetComponent<Text>().text = "Port No.";
-        device_2.GetComponent<Text>().text = "Device 2";
-        port_2.GetComponent<Text>().text = "Port No.";
         menu_active = false;
         gameObject.SetActive(false);
         main.SetActive(true);

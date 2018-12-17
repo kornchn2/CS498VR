@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
 
-public class MainMenu : MonoBehaviour
+public class MainMenuTutorial : MonoBehaviour
 {
-    private GNS3Handle handle;
-    public GNS3ProjectHandle projectHandle;
-
     public GameObject subMenu;
     public GameObject linkMenu;
 
@@ -132,43 +129,11 @@ public class MainMenu : MonoBehaviour
         main_menu_option = 0;
 
         gameObject.SetActive(true);
-
-        handle = new GNS3Handle("192.168.56.1", 3080);
-        projectHandle = handle.ProjectHandle("abc46e15-c32a-45ae-9e86-e896ea0afac2");
-
-        StartCoroutine(handle.CheckHealth(() => Debug.Log("handle good"), () => Debug.Log("handle bad")));
-        StartCoroutine(projectHandle.CheckHealth(() => Debug.Log("project handle good"), () => Debug.Log("project handle bad")));
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            StartCoroutine(projectHandle.ListNodes(
-                (List<GNS3ProjectHandle.Node> nodes) =>
-                {
-                    foreach (var node in nodes)
-                    {
-                        Debug.Log(node.name + " " + node.console_type);
-                        foreach (var port in node.ports)
-                        {
-                            Debug.Log(port.adapter_number + " " + port.port_number);
-                        }
-                    }
-                },
-                () => Debug.Log("ListNodes failed")
-            ));
-        }
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            var appliances = handle.GetAppliances();
-            foreach (var appliance in appliances)
-            {
-                Debug.Log(appliance.name + " " + appliance.appliance_id + " " + appliance.category);
-            }
-        }
-
         if (OVRInput.GetDown(OVRInput.Button.Two)) // 'B' button
 
         {
@@ -333,24 +298,9 @@ public class MainMenu : MonoBehaviour
         }
     }
 
-    int router_index;
-    int switch_index;
     void createRouter()
     {
         bool found_location = false;
-
-        for (int i = 0; i < 12; i++)
-        {
-            // server = GameObject.Find("/Racks").GetComponent<RackObjectData>().routers[i];
-
-            if (!GameObject.Find("/Racks").GetComponent<RackObjectData>().routers[i].obj.activeSelf)
-            {
-                router_index = i;
-                found_location = true;
-                GameObject.Find("/Racks").GetComponent<RackObjectData>().routers[i].obj.SetActive(true);
-                break;
-            }
-        }
 
         if (!found_location)
         {
@@ -359,31 +309,16 @@ public class MainMenu : MonoBehaviour
         else
         {
             /*
-                Call Victor's Function (for ID) 1966b864-93e7-32d5-965f-001384eec461
+                Call Victor's Function (for ID)
             */
-            StartCoroutine(projectHandle.CreateAppliance(
-                "7465a102-5c54-4cc6-ab76-7e917955223b", // c7200 id
-                (GNS3ProjectHandle.Node node) =>
-                {
-                    //server.name = node.name;
-                    GameObject.Find("/Racks").GetComponent<RackObjectData>().routers[router_index].name = node.name;
+            //server.id = ;
 
-                    //server.id = node.node_id;
-                    GameObject.Find("/Racks").GetComponent<RackObjectData>().routers[router_index].id = node.node_id;
-
-                    Debug.Log("Successfully created appliance");
-
-                    subMenuScript = GameObject.Find("/OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/Create SubMenu").GetComponent<CreateSubMenu>();
-                    subMenuScript.created_server = GameObject.Find("/Racks").GetComponent<RackObjectData>().routers[router_index];
-                    sleepMenu();
-                    //gameObject.SetActive(false);
-                    subMenu.SetActive(true);
-                },
-                () => Debug.Log("Failed to create router")
-            ));
-            //server.id = 
             // highlight object
-            
+            subMenuScript = GameObject.Find("/OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/Create SubMenu").GetComponent<CreateSubMenu>();
+            subMenuScript.created_server = server;
+
+            gameObject.SetActive(false);
+            subMenu.SetActive(true);
         }
     }
 
@@ -393,13 +328,12 @@ public class MainMenu : MonoBehaviour
 
         for (int i = 0; i < 12; i++)
         {
-            // server = GameObject.Find("/Racks").GetComponent<RackObjectData>().switches[i];
+            server = GameObject.Find("/Racks").GetComponent<RackObjectData>().switches[i];
 
-            if (!GameObject.Find("/Racks").GetComponent<RackObjectData>().switches[i].obj.activeSelf)
+            if (!server.obj.activeSelf)
             {
                 found_location = true;
-                switch_index = i;
-                GameObject.Find("/Racks").GetComponent<RackObjectData>().switches[i].obj.SetActive(true);
+                server.obj.SetActive(true);
                 break;
             }
         }
@@ -410,24 +344,17 @@ public class MainMenu : MonoBehaviour
         }
         else
         {
-            StartCoroutine(projectHandle.CreateAppliance(
-                "1966b864-93e7-32d5-965f-001384eec461", // c7200 id
-                (GNS3ProjectHandle.Node node) =>
-                {
-                    //server.name = node.name;
-                    GameObject.Find("/Racks").GetComponent<RackObjectData>().switches[switch_index].name = node.name;
+            /*
+                Call Victor's Function (for ID)
+            */
+            //server.id = ;
 
-                    //server.id = node.node_id;
-                    GameObject.Find("/Racks").GetComponent<RackObjectData>().switches[switch_index].id = node.node_id;
+            // highlight object
+            subMenuScript = GameObject.Find("/OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/Create SubMenu").GetComponent<CreateSubMenu>();
+            subMenuScript.created_server = server;
 
-                    subMenuScript = GameObject.Find("/OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/Create SubMenu").GetComponent<CreateSubMenu>();
-                    subMenuScript.created_server = GameObject.Find("/Racks").GetComponent<RackObjectData>().switches[switch_index];
-                    sleepMenu();
-                    //gameObject.SetActive(false);
-                    subMenu.SetActive(true);
-                },
-                () => Debug.Log("Failed to create router")
-            ));
+            gameObject.SetActive(false);
+            subMenu.SetActive(true);
         }
     }
 

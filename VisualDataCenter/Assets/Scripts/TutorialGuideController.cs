@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TutorialGuideController : MonoBehaviour {
+public class TutorialGuideController : MonoBehaviour
+{
 
     public Animator animChar;
     public GameObject user;
     public GameObject canvas;
+    public GameObject initialCanvas;
+    public GameObject contextMenu;
+    public GameObject exampleRouter;
+    public GameObject exampleRouter2;
 
     public float letterPause = 0.07f;
     public string[] message;
@@ -23,6 +28,8 @@ public class TutorialGuideController : MonoBehaviour {
     private bool tutorialReady;
     private bool tutorialStart;
     private bool isTalking;
+    private bool exampleStart;
+    private bool start;
 
     public Transform[] target;
     public float speed;
@@ -31,7 +38,8 @@ public class TutorialGuideController : MonoBehaviour {
     public GameObject textX;
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         animChar = GetComponent<Animator>();
         talking = false;
         secondTalk = false;
@@ -40,21 +48,27 @@ public class TutorialGuideController : MonoBehaviour {
         tutorialReady = false;
         tutorialStart = false;
         isTalking = false;
+        exampleStart = false;
+        start = false;
 
         time = 0;
 
-        message = new string[5];
+        message = new string[8];
         message[0] = "This is the server room!";
         message[1] = "You can create routers and servers.";
         message[2] = "Then, you can connect them together to create networks.";
         message[3] = "Here, give it a try!";
-        message[4] = "Press X to open up your Context Menu.";
+        message[4] = "Press B to open up your Context Menu.";
+        message[5] = "Press \"Create Routers\" to create exaxmple routers.";
+        message[6] = "Now try to Link it with other routers by going to Link, hovering over a router then selecting device!";
+        message[7] = "Congratulations! You have successfully linked routers/switches together! Press A to move on!";
 
         current = 0;
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update()
+    {
 
         handleRotation(current);
         handleConversation();
@@ -73,7 +87,8 @@ public class TutorialGuideController : MonoBehaviour {
             }
         }
 
-        if (current == 2) {
+        if (current == 2)
+        {
             this.GetComponent<AudioSource>().Play();
             animChar.SetBool("isTutorial", false);
             animChar.SetBool("idleTutorial", true);
@@ -87,7 +102,8 @@ public class TutorialGuideController : MonoBehaviour {
         {
             transform.rotation = Quaternion.Euler(0, 90, 0);
         }
-        else if (current == 2) {
+        else if (current == 2)
+        {
             transform.rotation = Quaternion.Euler(0, -90, 0);
         }
     }
@@ -95,27 +111,45 @@ public class TutorialGuideController : MonoBehaviour {
     void handleConversation()
     {
 
-        if (!talking && Mathf.Abs(user.transform.position.z) - Mathf.Abs(this.transform.position.z) < 4f && Input.GetKeyDown(KeyCode.X) && !isTalking)
+        if (!talking && Mathf.Abs(user.transform.position.z) - Mathf.Abs(this.transform.position.z) < 4f && (OVRInput.GetDown(OVRInput.Button.One)) && !isTalking)
         {
+            initialCanvas.SetActive(false);
             this.GetComponent<AudioSource>().Play();
             conversation(message[0]);
         }
-        else if (secondTalk && Input.GetKeyDown(KeyCode.X) && !thirdTalk && !isTalking)
+        else if (secondTalk && (OVRInput.GetDown(OVRInput.Button.One)) && !thirdTalk && !isTalking)
         {
             conversation(message[1]);
         }
-        else if (thirdTalk && Input.GetKeyDown(KeyCode.X) && !forthTalk && !isTalking)
+        else if (thirdTalk && (OVRInput.GetDown(OVRInput.Button.One)) && !forthTalk && !isTalking)
         {
             conversation(message[2]);
         }
-        else if (forthTalk && Input.GetKeyDown(KeyCode.X) && !tutorialReady && !isTalking)
+        else if (forthTalk && (OVRInput.GetDown(OVRInput.Button.One)) && !tutorialReady && !isTalking)
         {
             conversation(message[3]);
         }
-        else if (tutorialReady && Input.GetKeyDown(KeyCode.X) && !isTalking)
+        else if (tutorialReady && (OVRInput.GetDown(OVRInput.Button.One)) && !tutorialStart && !isTalking)
         {
             conversation(message[4]);
         }
+        else if (tutorialStart && (OVRInput.GetDown(OVRInput.Button.Two)) && !exampleStart && !isTalking)
+        {
+            conversation(message[5]);
+            exampleRouter.SetActive(true);
+            exampleRouter2.SetActive(true);
+        }
+        else if (GameObject.Find("/OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/Create LinkMenu").GetComponent<LinkSubMenu>().pressedYes)
+        {
+            conversation(message[7]);
+        }
+        else if (exampleStart && (OVRInput.GetDown(OVRInput.Button.One)) && !isTalking)
+        {
+            exampleStart = false;
+            conversation(message[6]);
+
+        }
+
     }
 
     void conversation(string text)
@@ -156,6 +190,18 @@ public class TutorialGuideController : MonoBehaviour {
         else if (!tutorialReady)
         {
             tutorialReady = true;
+        }
+        else if (!tutorialStart)
+        {
+            contextMenu.SetActive(true);
+            tutorialStart = true;
+        }
+        else if (!exampleStart)
+        {
+            exampleStart = true;
+        }
+        else {
+            Application.LoadLevel(2);
         }
 
     }

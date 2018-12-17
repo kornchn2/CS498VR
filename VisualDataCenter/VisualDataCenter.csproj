@@ -235,6 +235,9 @@
     <Reference Include="Managed/Unity.Locator">
       <HintPath>C:\Program Files\Unity\Editor\Data\Managed/Unity.Locator.dll</HintPath>
     </Reference>
+    <Reference Include="Facebook.Unity.Settings">
+      <HintPath>Library/FacebookSDK/Facebook.Unity.Settings.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
     </Reference>
@@ -269,10 +272,10 @@
       <HintPath>Assets/ProCore/ProBuilder/Classes/ClassesLib/Poly2Tri.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Analytics">
-      <HintPath>C:/Users/dschoi3/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.16/UnityEngine.Analytics.dll</HintPath>
+      <HintPath>C:/Users/vsui2.UOFI/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.16/UnityEngine.Analytics.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.StandardEvents">
-      <HintPath>C:/Users/dschoi3/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.13/UnityEngine.StandardEvents.dll</HintPath>
+      <HintPath>C:/Users/vsui2.UOFI/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.13/UnityEngine.StandardEvents.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:\Program Files\Unity\Editor\Data\MonoBleedingEdge\lib\mono\unity\mscorlib.dll</HintPath>
@@ -324,6 +327,7 @@
     <Compile Include="Assets\CreateSubMenu.cs" />
     <Compile Include="Assets\LinkSubMenu.cs" />
     <Compile Include="Assets\MainMenu.cs" />
+    <Compile Include="Assets\MainMenuTutorial.cs" />
     <Compile Include="Assets\Oculus\AudioManager\Scenes\Scripts\TestScript.cs" />
     <Compile Include="Assets\Oculus\AudioManager\Scripts\Audio\AmbienceEmitter.cs" />
     <Compile Include="Assets\Oculus\AudioManager\Scripts\Audio\AudioManager.cs" />
@@ -673,6 +677,7 @@
     <Compile Include="Assets\Scripts\setConsoleText.cs" />
     <Compile Include="Assets\Scripts\TutorialGuideController.cs" />
     <Compile Include="Assets\Scripts\Utility.cs" />
+    <Compile Include="Assets\Scripts\UtilityTutorial.cs" />
     <Compile Include="Assets\server.cs" />
     <Compile Include="Assets\Supercyan Character Pack Free Sample\Scripts\CameraLogic.cs" />
     <Compile Include="Assets\Supercyan Character Pack Free Sample\Scripts\Demo.cs" />

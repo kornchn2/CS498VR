@@ -83,7 +83,7 @@ public class CreateSubMenu : MonoBehaviour
         else
             type_text.text = "Device Type: Switch";
 
-        id_text.text = "ID: " + created_server.id.ToString();
+        id_text.text = "ID: " + created_server.name;
 
         if (OVRInput.GetDown(OVRInput.Button.One) || OVRInput.GetDown(OVRInput.Button.Two))
         {

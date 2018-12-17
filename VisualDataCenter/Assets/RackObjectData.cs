@@ -8,7 +8,8 @@ public class RackObjectData : MonoBehaviour {
     {
         public GameObject obj;
         public bool is_router;
-        public int id;
+        public string id;
+        public string name;
         public bool[] ports = new bool[8];
     }
 

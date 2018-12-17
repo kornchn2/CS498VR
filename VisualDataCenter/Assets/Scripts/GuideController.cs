@@ -21,6 +21,7 @@ public class GuideController : MonoBehaviour {
     private bool tutorialReady;
     private bool tutorialStart;
     private bool isTalking;
+    private bool pause;
 
     public Transform[] target;
     public float speed;
@@ -34,6 +35,10 @@ public class GuideController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        if (Time.timeScale == 0f)
+        {
+            Time.timeScale = 1f;
+        }
         animChar = GetComponent<Animator>();
         talking = false;
         secondTalk = false;
@@ -42,15 +47,17 @@ public class GuideController : MonoBehaviour {
         tutorialReady = false;
         tutorialStart = false;
         isTalking = false;
+        pause = false;
 
         time = 0;
 
-        message = new string[5];
+        message = new string[6];
         message[0] = "Hi! Welcome to our New Data Center!";
         message[1] = "Explore routers and see your result!";
         message[2] = "First, you will go through our tutorial.";
         message[3] = "Then, you will get to explore!";
-        message[4] = "Alright, follow me!";
+        message[4] = "You can always pause by pressing Y!";
+        message[5] = "Alright, follow me!";
 
         current = 0;
     }
@@ -76,27 +83,31 @@ public class GuideController : MonoBehaviour {
 
     void handleConversation() {
         
-        if (!talking && Mathf.Abs(user.transform.position.z) - Mathf.Abs(this.transform.position.z) < 4f && Input.GetKeyDown(KeyCode.X) && !isTalking)
+        if (!talking && Mathf.Abs(user.transform.position.z) - Mathf.Abs(this.transform.position.z) < 4f && (OVRInput.GetDown(OVRInput.Button.One)) && !isTalking)
         {
             this.GetComponent<AudioSource>().Play();
             initialCanvas.SetActive(false);
             conversation(message[0]);
         }
-        else if (secondTalk && Input.GetKeyDown(KeyCode.X) && !thirdTalk && !isTalking)
+        else if (secondTalk && (OVRInput.GetDown(OVRInput.Button.One)) && !thirdTalk && !isTalking)
         {
             conversation(message[1]);
         }
-        else if (thirdTalk && Input.GetKeyDown(KeyCode.X) && !forthTalk && !isTalking)
+        else if (thirdTalk && (OVRInput.GetDown(OVRInput.Button.One)) && !forthTalk && !isTalking)
         {
             conversation(message[2]);
         }
-        else if (forthTalk && Input.GetKeyDown(KeyCode.X) && !tutorialReady && !isTalking)
+        else if (forthTalk && (OVRInput.GetDown(OVRInput.Button.One)) && !pause && !isTalking)
         {
             conversation(message[3]);
         }
-        else if (tutorialReady && Input.GetKeyDown(KeyCode.X) && !isTalking)
+        else if (pause && (OVRInput.GetDown(OVRInput.Button.One)) && !tutorialReady && !isTalking)
         {
             conversation(message[4]);
+        }
+        else if (tutorialReady && (OVRInput.GetDown(OVRInput.Button.One)) && !isTalking)
+        {
+            conversation(message[5]);
         }
     }
 
@@ -133,11 +144,15 @@ public class GuideController : MonoBehaviour {
         {
             forthTalk = true;
         }
-        else if (!tutorialReady)
+        else if (!pause)
         {
+            pause = true;
+        }
+        else if (!tutorialReady) {
             tutorialReady = true;
         }
-        else {
+        else
+        {
             redX.SetActive(false);
             whiteX.SetActive(false);
             textX.SetActive(false);

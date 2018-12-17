@@ -13,13 +13,11 @@ using UnityEngine.Networking;
 
 public class GNS3Handle
 {
-    public NetworkManager manager;
     public readonly string url;
     private List<Appliance> appliances;
 
-    public GNS3Handle(string ip, int port, NetworkManager manager_)
+    public GNS3Handle(string ip, int port)
     {
-        manager = manager_;
         url = "http://" + ip + ":" + port.ToString() + "/v2/";
         Debug.Log("Creating GNS3 handle at url " + url);
     }
@@ -215,11 +213,13 @@ public class GNS3ProjectHandle
         }
     }
 
-    public IEnumerator CreateAppliance(string appliance_id)
+    public IEnumerator CreateAppliance(string appliance_id, Action<Node> onSuccess, Action onFailure)
     {
         // Get type of appliance
+        Debug.Log("Creating appliance");
         var appliances = handle.GetAppliances();
         GNS3Handle.Appliance appliance = appliances.Find(app => app.appliance_id == appliance_id);
+
         if (appliance == null)
         {
             Debug.Log("Appliance " + appliance_id + " seems to not exist");
@@ -233,18 +233,21 @@ public class GNS3ProjectHandle
         request.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
-
         yield return request.SendWebRequest();
+
         if (request.isNetworkError || request.isHttpError)
         {
+            Debug.Log("THERE WAS AN ERROR");
             Debug.Log(request.downloadHandler.text);
+            yield break;
         }
         else
         {
-            // TODO
+            Debug.Log("Yielding to ListNodes");
             yield return ListNodes(
                 (List<Node> newNodes) =>
                 {
+                    Debug.Log("Calling ListNodes");
                     var oldNodes = GetNodes();
 
                     if (newNodes.Count != oldNodes.Count + 1)
@@ -255,9 +258,10 @@ public class GNS3ProjectHandle
 
                     foreach (var node in newNodes)
                     {
-                        if (!oldNodes.Contains(node))
+                        if (oldNodes.Find(n => n.node_id == node.node_id) == null)
                         {
                             nodes.Add(node);
+                            /*
                             GameObject newAppliance = null;
                             if (appliance.category == "switch")
                             {
@@ -279,15 +283,20 @@ public class GNS3ProjectHandle
                             if (deviceScript == null)
                             {
                                 Debug.Log("CreateAppliance error: device does not have a NetworkDevice script attached to it");
+                                onFailure();
                                 return;
                             }
                             deviceScript.node = node;
+                            */
+                            onSuccess(node);
                             Debug.Log("Successfully added new " + node.node_type + " node with id " + node.node_id);
+                            return;
                         }
                     }
                 },
-                () => Debug.Log("Failed to update project handle nodes")
+                () => { Debug.Log("Failed to update project handle nodes"); onFailure(); }
             );
+            Debug.Log("Done yielding...");
             //
             Debug.Log(request.downloadHandler.text);
         }
@@ -314,15 +323,15 @@ public class GNS3ProjectHandle
     [System.Serializable]
     public class LinkInput
     {
-        public LinkInput(string nodeA_id, string nodeB_id, int nodeA_portNumber, int nodeB_portNumber)
+        public LinkInput(string nodeA_id, string nodeB_id, int nodeA_portNumber, int nodeB_portNumber, int nodeA_adapter, int nodeB_adapter)
         {
             nodes = new List<LinkInputNode>();
             var a = new LinkInputNode();
-            a.adapter_number = nodeA_portNumber;
+            a.adapter_number = nodeA_adapter;
             a.port_number = nodeA_portNumber;
             a.node_id = nodeA_id;
             var b = new LinkInputNode();
-            b.adapter_number = nodeB_portNumber;
+            b.adapter_number = nodeB_adapter;
             b.port_number = nodeB_portNumber;
             b.node_id = nodeB_id;
             nodes.Add(a);
@@ -340,9 +349,9 @@ public class GNS3ProjectHandle
         public int port_number;
     }
 
-    public IEnumerator CreateLink(string nodeA_id, string nodeB_id, int nodeA_portNumber, int nodeB_portNumber)
+    public IEnumerator CreateLink(string nodeA_id, string nodeB_id, int nodeA_portNumber, int nodeB_portNumber, int nodeA_adapter, int nodeB_adapter)
     {
-        var input = new LinkInput(nodeA_id, nodeB_id, nodeA_portNumber, nodeB_portNumber);
+        var input = new LinkInput(nodeA_id, nodeB_id, nodeA_portNumber, nodeB_portNumber, nodeA_adapter, nodeB_adapter);
         string postData = JsonUtility.ToJson(input);
 
         byte[] bodyRaw = Encoding.UTF8.GetBytes(postData);
@@ -630,7 +639,7 @@ public class NetworkManager : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        handle = new GNS3Handle("192.168.56.1", 3080, this);
+        handle = new GNS3Handle("192.168.56.1", 3080);
         projectHandle = handle.ProjectHandle("abc46e15-c32a-45ae-9e86-e896ea0afac2");
         StartCoroutine(handle.CheckHealth(
             () => Debug.Log("Connection is good"),
@@ -676,7 +685,7 @@ public class NetworkManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.V))
         {
-            StartCoroutine(projectHandle.CreateAppliance("7465a102-5c54-4cc6-ab76-7e917955223b"));
+            // StartCoroutine(projectHandle.CreateAppliance("7465a102-5c54-4cc6-ab76-7e917955223b"));
         }
         if (Input.GetKeyDown(KeyCode.B))
         {
@@ -686,6 +695,10 @@ public class NetworkManager : MonoBehaviour
                     foreach (var node in nodes)
                     {
                         Debug.Log(node.name + " " + node.console_type);
+                        foreach (var port in node.ports)
+                        {
+                            Debug.Log(port.adapter_number + " " + port.port_number);
+                        }
                     }
                 },
                 () => Debug.Log("ListNodes failed")
@@ -693,7 +706,7 @@ public class NetworkManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.N))
         {
-            StartCoroutine(projectHandle.CreateLink("0453abfb-900b-44cb-811c-ea77e79fda6c", "5b2ca014-913b-4a72-b6bc-23588cd34c48", 0, 0));
+            // StartCoroutine(projectHandle.CreateLink("0453abfb-900b-44cb-811c-ea77e79fda6c", "5b2ca014-913b-4a72-b6bc-23588cd34c48", 0, 0));
         }
         if (Input.GetKeyDown(KeyCode.U))
         {
