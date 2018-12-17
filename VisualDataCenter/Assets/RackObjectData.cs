@@ -9,6 +9,7 @@ public class RackObjectData : MonoBehaviour {
         public GameObject obj;
         public bool is_router;
         public int id;
+        public bool[] ports = new bool[8];
     }
 
     // routers
@@ -51,30 +52,30 @@ public class RackObjectData : MonoBehaviour {
         router_3 = GameObject.Find("/Racks/Front Left/Server 3");
         router_4 = GameObject.Find("/Racks/Front Left/Server 4");
 
-        router_5 = GameObject.Find("/Racks/Front Mid/Server 1");
-        router_6 = GameObject.Find("/Racks/Front Mid/Server 2");
-        router_7 = GameObject.Find("/Racks/Front Mid/Server 3");
-        router_8 = GameObject.Find("/Racks/Front Mid/Server 4");
+        router_5 = GameObject.Find("/Racks/Front Mid/Server 5");
+        router_6 = GameObject.Find("/Racks/Front Mid/Server 6");
+        router_7 = GameObject.Find("/Racks/Front Mid/Server 7");
+        router_8 = GameObject.Find("/Racks/Front Mid/Server 8");
 
-        router_9 = GameObject.Find("/Racks/Front Right/Server 1");
-        router_10 = GameObject.Find("/Racks/Front Right/Server 2");
-        router_11 = GameObject.Find("/Racks/Front Right/Server 3");
-        router_12 = GameObject.Find("/Racks/Front Right/Server 4");
+        router_9 = GameObject.Find("/Racks/Front Right/Server 9");
+        router_10 = GameObject.Find("/Racks/Front Right/Server 10");
+        router_11 = GameObject.Find("/Racks/Front Right/Server 11");
+        router_12 = GameObject.Find("/Racks/Front Right/Server 12");
 
-        switch_1 = GameObject.Find("/Racks/Back Left/Server 1");
-        switch_2 = GameObject.Find("/Racks/Back Left/Server 2");
-        switch_3 = GameObject.Find("/Racks/Back Left/Server 3");
-        switch_4 = GameObject.Find("/Racks/Back Left/Server 4");
+        switch_1 = GameObject.Find("/Racks/Back Left/Server 13");
+        switch_2 = GameObject.Find("/Racks/Back Left/Server 14");
+        switch_3 = GameObject.Find("/Racks/Back Left/Server 15");
+        switch_4 = GameObject.Find("/Racks/Back Left/Server 16");
 
-        switch_5 = GameObject.Find("/Racks/Back Mid/Server 1");
-        switch_6 = GameObject.Find("/Racks/Back Mid/Server 2");
-        switch_7 = GameObject.Find("/Racks/Back Mid/Server 3");
-        switch_8 = GameObject.Find("/Racks/Back Mid/Server 4");
+        switch_5 = GameObject.Find("/Racks/Back Mid/Server 17");
+        switch_6 = GameObject.Find("/Racks/Back Mid/Server 18");
+        switch_7 = GameObject.Find("/Racks/Back Mid/Server 19");
+        switch_8 = GameObject.Find("/Racks/Back Mid/Server 20");
 
-        switch_9 = GameObject.Find("/Racks/Back Right/Server 1");
-        switch_10 = GameObject.Find("/Racks/Back Right/Server 2");
-        switch_11 = GameObject.Find("/Racks/Back Right/Server 3");
-        switch_12 = GameObject.Find("/Racks/Back Right/Server 4");
+        switch_9 = GameObject.Find("/Racks/Back Right/Server 21");
+        switch_10 = GameObject.Find("/Racks/Back Right/Server 22");
+        switch_11 = GameObject.Find("/Racks/Back Right/Server 23");
+        switch_12 = GameObject.Find("/Racks/Back Right/Server 24");
 
         // set up stuff
         for (int i = 0; i < 12; i++)
@@ -84,6 +85,14 @@ public class RackObjectData : MonoBehaviour {
 
             switches[i] = new ObjectData();
             switches[i].is_router = false;
+
+            for (int j = 0; j < 8; j++)
+            {
+                if (j < 4)  routers[i].ports[j] = false;
+                else        routers[i].ports[j] = true;            
+
+                switches[i].ports[j] = false;
+            }
         }
 
         // set up GameObjects

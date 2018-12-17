@@ -8,8 +8,7 @@ public class CreateSubMenu : MonoBehaviour
 
     public GameObject main;
 
-    public bool is_router;
-    public int id_no;
+    public RackObjectData.ObjectData created_server;
 
     private Vector3 menu_sleep = new Vector3(0, 0, 0);
     private Vector3 menu_awake = new Vector3(0.0005f, 0.0005f, 0.0005f);
@@ -46,7 +45,7 @@ public class CreateSubMenu : MonoBehaviour
         // Main Menu Choices
         type = GameObject.Find("/OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/Create SubMenu/Type");
         id = GameObject.Find("/OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/Create SubMenu/ID");
-        ok = GameObject.Find("/OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/Create SubMenu/Ok");  
+        ok = GameObject.Find("/OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/Create SubMenu/Ok");
 
 
         // Main Menu Text Objects
@@ -79,17 +78,15 @@ public class CreateSubMenu : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(id_no.ToString());
-        Debug.Log(is_router);
-        if (is_router)
-            type_text.text = "Device Type: Router"; 
+        if (created_server.is_router)
+            type_text.text = "Device Type: Router";
         else
             type_text.text = "Device Type: Switch";
 
-        id_text.text = "ID: " + id_no.ToString();
+        id_text.text = "ID: " + created_server.id.ToString();
 
-        if (OVRInput.GetDown(OVRInput.Button.One) || OVRInput.GetDown(OVRInput.Button.Two)) {
-
+        if (OVRInput.GetDown(OVRInput.Button.One) || OVRInput.GetDown(OVRInput.Button.Two))
+        {
             type_text.text = "Device Type: ";
             id_text.text = "ID: ";
 

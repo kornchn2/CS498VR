@@ -8,6 +8,8 @@ public class server : MonoBehaviour {
     public GameObject hand;
     public Renderer mesh;
 
+    public GameObject collided_server;
+
     GameObject link_menu;
 
     Color temp;
@@ -19,26 +21,33 @@ public class server : MonoBehaviour {
         hand = GameObject.Find("/OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor");
         link_menu = GameObject.Find("/OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/Create LinkMenu");
         highlight = false;
-        mesh = GameObject.Find("panel_for_server").GetComponent<MeshRenderer>();
+        mesh = gameObject.GetComponent<MeshRenderer>();
         temp = mesh.material.color;
     }
 	
 	// Update is called once per frame
 	void Update () {
-
-        if (highlight /*&& link_menu.activeSelf*/)
+        if (highlight && link_menu.activeSelf)
         {
-            mesh.material.color = Color.white;
+            mesh.material.color = Color.magenta;
         }
         else mesh.material.color = temp; 
 	}
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject == hand) highlight = true;
+        if (other.gameObject == hand)
+        {
+            highlight = true;
+            link_menu.GetComponent<LinkSubMenu>().collided_server = gameObject;
+        }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject == hand) highlight = false;
+        if (other.gameObject == hand)
+        {
+            highlight = false;
+            link_menu.GetComponent<LinkSubMenu>().collided_server = null;
+        }
     }
 }

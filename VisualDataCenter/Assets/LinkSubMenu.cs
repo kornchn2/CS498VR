@@ -7,6 +7,13 @@ public class LinkSubMenu : MonoBehaviour
 {
 
     public GameObject main;
+    private GameObject data;
+
+    public GameObject collided_server;
+
+    private RackObjectData.ObjectData device_one = new RackObjectData.ObjectData();
+    private RackObjectData.ObjectData device_two = new RackObjectData.ObjectData();
+    private int port_one, port_two;
 
     public bool menu_active;
     private int menu_option, last_option;
@@ -42,6 +49,9 @@ public class LinkSubMenu : MonoBehaviour
         // player
         player = GameObject.Find("/OVRPlayerController");
 
+        // ojbect data
+        data = GameObject.Find("/Racks");
+
         // Main Context Menu
         main = GameObject.Find("/OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/Main Menu");
         menu = GameObject.Find("/OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/Create LinkMenu");
@@ -51,7 +61,7 @@ public class LinkSubMenu : MonoBehaviour
         device_1 = GameObject.Find("/OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/Create LinkMenu/Device 1");
         port_1 = GameObject.Find("/OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/Create LinkMenu/Port 1");
         device_2 = GameObject.Find("/OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/Create LinkMenu/Device 2");
-        port_2  = GameObject.Find("/OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/Create LinkMenu/Port 2");
+        port_2 = GameObject.Find("/OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/Create LinkMenu/Port 2");
         confirm = GameObject.Find("/OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/Create LinkMenu/Confirm");
         cancel = GameObject.Find("/OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/Create LinkMenu/Cancel");
 
@@ -82,6 +92,9 @@ public class LinkSubMenu : MonoBehaviour
 
         horiz_active = false;
         vert_active = false;
+
+        device_one = null;
+        device_two = null;
 
         // set menu inactive
         gameObject.SetActive(false);
@@ -226,11 +239,92 @@ public class LinkSubMenu : MonoBehaviour
 
     void chooseDeviceOne()
     {
+        if(collided_server != null && OVRInput.GetDown(OVRInput.Button.One))
+        {
+            for(int i = 0; i < 12; i++)
+            {
+                if (data.GetComponent<RackObjectData>().routers[i].obj.name == collided_server.name)
+                {
+                    device_one = data.GetComponent<RackObjectData>().routers[i];
+                    for (int j = 0; j < 8; j++)
+                    {
+                        if (!device_one.ports[j])
+                        {
+                            data.GetComponent<RackObjectData>().routers[i].ports[j] = true;
+                            port_one = j;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                else if (data.GetComponent<RackObjectData>().switches[i].obj.name == collided_server.name)
+                {
+                    device_one = data.GetComponent<RackObjectData>().switches[i];
+                    for (int j = 0; j < 8; j++)
+                    {
+                        if (!device_one.ports[j])
+                        {
+                            data.GetComponent<RackObjectData>().switches[i].ports[j] = true;
+                            port_one = j;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
 
+            if (device_one == null) port_1.GetComponentInChildren<Text>().text = "No Ports";
+            else
+            {
+                device_1.GetComponentInChildren<Text>().text = "ID " + device_one.id.ToString();
+                port_1.GetComponentInChildren<Text>().text = "Port " + port_one.ToString();
+            }
+        }
     }
 
     void chooseDeviceTwo()
     {
+        if (collided_server != null && OVRInput.GetDown(OVRInput.Button.One))
+        {
+            for (int i = 0; i < 12; i++)
+            {
+                if (data.GetComponent<RackObjectData>().routers[i].obj.name == collided_server.name)
+                {
+                    device_two = data.GetComponent<RackObjectData>().routers[i];
+                    for (int j = 0; j < 8; i++)
+                    {
+                        if (!device_two.ports[j])
+                        {
+                            data.GetComponent<RackObjectData>().routers[i].ports[j] = true;
+                            port_two = j;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                else if (data.GetComponent<RackObjectData>().switches[i].obj.name == collided_server.name)
+                {
+                    device_two = data.GetComponent<RackObjectData>().switches[i];
+                    for (int j = 0; j < 8; i++)
+                    {
+                        if (!device_two.ports[j])
+                        {
+                            data.GetComponent<RackObjectData>().switches[i].ports[j] = true;
+                            port_two = j;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+
+            if (device_two == null) port_2.GetComponentInChildren<Text>().text = "No Ports";
+            else
+            {
+                device_2.GetComponentInChildren<Text>().text = "ID " + device_one.id.ToString();
+                port_2.GetComponentInChildren<Text>().text = "Port " + port_one.ToString();
+            }
+        }
     }
 
     void choosePortOne()
@@ -243,10 +337,23 @@ public class LinkSubMenu : MonoBehaviour
 
     void confirmLink()
     {
+        if(device_one != null && device_two != null && OVRInput.GetDown(OVRInput.Button.One))
+        {
+            /*
+                Call Victor's function
+            */
+            // set up cable
+            device_one = null;
+            device_two = null;
+        }
     }
 
     void exitMenu()
     {
+        device_1.GetComponent<Text>().text = "Device 1";
+        port_1.GetComponent<Text>().text = "Port No.";
+        device_2.GetComponent<Text>().text = "Device 2";
+        port_2.GetComponent<Text>().text = "Port No.";
         menu_active = false;
         gameObject.SetActive(false);
         main.SetActive(true);
