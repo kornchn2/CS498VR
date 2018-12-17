@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GuideController : MonoBehaviour {
+public class GuideController : MonoBehaviour
+{
 
     public Animator animChar;
     public GameObject user;
@@ -32,8 +33,9 @@ public class GuideController : MonoBehaviour {
     public GameObject whiteX;
     public GameObject textX;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
         animChar = GetComponent<Animator>();
         talking = false;
         secondTalk = false;
@@ -54,13 +56,15 @@ public class GuideController : MonoBehaviour {
 
         current = 0;
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update()
+    {
 
         handleConversation();
-        if (tutorialStart) {
-          
+        if (tutorialStart)
+        {
+
             animChar.SetBool("isTutorial", true);
             if (current < target.Length && transform.position != target[current].position)
             {
@@ -68,51 +72,56 @@ public class GuideController : MonoBehaviour {
                 Vector3 pos = Vector3.MoveTowards(transform.position, target[current].position, speed * Time.deltaTime);
                 GetComponent<Rigidbody>().MovePosition(pos);
             }
-            else {
+            else
+            {
                 current += 1;
             }
         }
-	}
+    }
 
-    void handleConversation() {
-        
-        if (!talking && Mathf.Abs(user.transform.position.z) - Mathf.Abs(this.transform.position.z) < 4f && Input.GetKeyDown(KeyCode.X) && !isTalking)
+    void handleConversation()
+    {
+
+        if (!talking && Mathf.Abs(user.transform.position.z) - Mathf.Abs(this.transform.position.z) < 4f && (OVRInput.GetDown(OVRInput.Button.One)) && !isTalking)
         {
             this.GetComponent<AudioSource>().Play();
             initialCanvas.SetActive(false);
             conversation(message[0]);
         }
-        else if (secondTalk && Input.GetKeyDown(KeyCode.X) && !thirdTalk && !isTalking)
+        else if (secondTalk && (OVRInput.GetDown(OVRInput.Button.One)) && !thirdTalk && !isTalking)
         {
             conversation(message[1]);
         }
-        else if (thirdTalk && Input.GetKeyDown(KeyCode.X) && !forthTalk && !isTalking)
+        else if (thirdTalk && (OVRInput.GetDown(OVRInput.Button.One)) && !forthTalk && !isTalking)
         {
             conversation(message[2]);
         }
-        else if (forthTalk && Input.GetKeyDown(KeyCode.X) && !tutorialReady && !isTalking)
+        else if (forthTalk && (OVRInput.GetDown(OVRInput.Button.One)) && !tutorialReady && !isTalking)
         {
             conversation(message[3]);
         }
-        else if (tutorialReady && Input.GetKeyDown(KeyCode.X) && !isTalking)
+        else if (tutorialReady && (OVRInput.GetDown(OVRInput.Button.One)) && !isTalking)
         {
             conversation(message[4]);
         }
     }
 
-    void conversation(string text) {
+    void conversation(string text)
+    {
         canvas.SetActive(true);
         talking = true;
         animChar.SetBool("isTalking", true);
         StartCoroutine(startText(text));
     }
-    IEnumerator startText(string text) {
+    IEnumerator startText(string text)
+    {
         dialogue.text = "";
         redX.SetActive(false);
         whiteX.SetActive(false);
         textX.SetActive(false);
         isTalking = true;
-        foreach (char letter in text.ToCharArray()) {
+        foreach (char letter in text.ToCharArray())
+        {
             dialogue.text += letter;
             yield return new WaitForSeconds(letterPause);
         }
@@ -137,7 +146,8 @@ public class GuideController : MonoBehaviour {
         {
             tutorialReady = true;
         }
-        else {
+        else
+        {
             redX.SetActive(false);
             whiteX.SetActive(false);
             textX.SetActive(false);
@@ -147,7 +157,8 @@ public class GuideController : MonoBehaviour {
         }
     }
 
-    void handleRotation(int current) {
+    void handleRotation(int current)
+    {
         if (current == 0)
         {
             transform.rotation = Quaternion.Euler(0, -90, 0);
